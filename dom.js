@@ -1,146 +1,168 @@
-window.dom = {
+window.dom={
 	//增
-	create(string) {
-		const container = document.createElement('template')
-		container.innerHTML = string.trim()
+	on2 (element, eventType, selector, fn) {
+		if (!(element instanceof Element)) {
+			element=document.querySelector(element);
+		}
+		element.addEventListener(eventType, (e) => {
+			let el=e.target;
+			if (el.matches(selector)) {
+				fn.call(el, e, el);
+			}
+		});
+	}
+	,
+	on (element, eventType, selector, fn) {
+		element.addEventListener(eventType, e => {
+			let el=e.target;
+			while (!el.matches(selector)) {
+				if (element === el) {
+					el=null;
+					break;
+				}
+				el=el.parentNode;
+			}
+			el && fn.call(el, e, el);
+		});
+		return element;
+	},
+	create (string) {
+		const container=document.createElement('template');
+		container.innerHTML=string.trim();
 		console.log(container);
-		return container.content.firstChild
+		return container.content.firstChild;
 	},
-	after(node, node2) {
-		node.parentNode.insertBefore(node2, node.nextSibling)
+	after (node, node2) {
+		node.parentNode.insertBefore(node2, node.nextSibling);
 	},
-	before(node, node2) {
-		node.parentNode.insertBefore(node2, node)
+	before (node, node2) {
+		node.parentNode.insertBefore(node2, node);
 	},
-	append(parent, node) {
-		parent.appendChild(node)
+	append (parent, node) {
+		parent.appendChild(node);
 	},
-	wrap(node, parent) {
-		dom.before(node, parent)
-		dom.append(parent, node)
+	wrap (node, parent) {
+		dom.before(node, parent);
+		dom.append(parent, node);
 	},
 	//删
-	remove(node) {
-		node.parentNode.removeChild(node)
-		return node
+	remove (node) {
+		node.parentNode.removeChild(node);
+		return node;
 	},
-	empty(node) {
-		const {childNodes} = node
-		let arr = []
-		let x = node.firstChild
+	empty (node) {
+		const {childNodes}=node;
+		let arr=[];
+		let x=node.firstChild;
 		while (x) {
-			arr.push(dom.remove(node.firstChild))
-			x = node.firstChild
+			arr.push(dom.remove(node.firstChild));
+			x=node.firstChild;
 		}
-		return arr
+		return arr;
 	},
 	//改
 	//读写属性
-	attr(node, name, value) {
+	attr (node, name, value) {
 		if (arguments.length === 3) {
-			node.setAttribute(name, value)
-		} else
+			node.setAttribute(name, value);
+		}else
 			if (arguments.length === 2) {
-				return node.getAttribute(name)
+				return node.getAttribute(name);
 			}
 	},
-	text(node, string) {
+	text (node, string) {
 		if (arguments.length === 2) {
-			'innerText' in node ? node.innerText = string : node.textContent = string
-		} else
+			'innerText' in node ? node.innerText=string : node.textContent=string;
+		}else
 			if (arguments.length === 1) {
 				if ('innerText' in node) {
-					return node.innerText
-				} else {
-					return node.textContent
+					return node.innerText;
+				}else {
+					return node.textContent;
 				}
 			}
 	},
-	html(node, string) {
+	html (node, string) {
 		if (arguments.length === 2) {
-			node.innerHtml = string
-		} else
-			return node.innerHtml
+			node.innerHtml=string;
+		}else
+			return node.innerHtml;
 	},
-	style(node, name, value) {
+	style (node, name, value) {
 		if (arguments.length === 3) {
 			//style(div,'color','red')
-			node.style[name] = value
-		} else
+			node.style[name]=value;
+		}else
 			if (arguments.length === 2) {
 				if (typeof name === 'string') {
 					//style(div,'color')
-					return node.style[name]
-				} else
+					return node.style[name];
+				}else
 					if (name instanceof Object) {
 						//dom.style(div,{color:'red'}
 						for (let key in name) {
-							node.style[key] = name[key]
+							node.style[key]=name[key];
 						}
 					}
 			}
 	},
 	class: {
-		add(node, className) {
-			node.classList.add(className)
+		add (node, className) {
+			node.classList.add(className);
 		},
-		remove(node, className) {
-			node.classList.remove(className)
+		remove (node, className) {
+			node.classList.remove(className);
 		},
-		has(node, className) {
-			return node.classList.contains(className)
+		has (node, className) {
+			return node.classList.contains(className);
 		},
-		on(node, eventName, fn) {
-			node.addEventListener(eventName, fn)
+		on (node, eventName, fn) {
+			node.addEventListener(eventName, fn);
 		},
-		off(node, eventName, fn) {
-			node.removeEventListener(eventName, fn)
+		off (node, eventName, fn) {
+			node.removeEventListener(eventName, fn);
 		},
-		find(selector, scope) {
-			return (scope || document).querySelectorAll(selector)  //返回一个数组
+		find (selector, scope) {
+			return (scope || document).querySelectorAll(selector);  //返回一个数组
 		},
 		//查
-		parent(node) {
-			return node.parentNode
+		parent (node) {
+			return node.parentNode;
 		},
-		children(node) {
-			return node.children()
+		children (node) {
+			return node.children();
 		},
-		siblings(node) {
-			return Array.from(node.parentNode.children).filter(n => n !== node)
+		siblings (node) {
+			return Array.from(node.parentNode.children).filter(n => n !== node);
 		},
-		next(node) {
-			let x = node.nextSibling
+		next (node) {
+			let x=node.nextSibling;
 			while (x.nodeType === 3) {
-				x = x.nextSibling
+				x=x.nextSibling;
 			}
-			return x
+			return x;
 		},
-		previous(node) {
-			let x = node.previousSibling
+		previous (node) {
+			let x=node.previousSibling;
 			while (x.nodeType === 3) {
-				x = x.previousSibling
+				x=x.previousSibling;
 			}
-			return x
+			return x;
 		},
-		each(nodeList, fn) {
-			for (let i = 0; i<nodeList.length; i++) {
-				fn.call(null, nodeList[i])
+		each (nodeList, fn) {
+			for (let i=0; i<nodeList.length; i++) {
+				fn.call(null, nodeList[i]);
 			}
 		},
-		index(node) {
-			const list = dom.children(node.parentNode)
-			let i
-			for (i = 0; i<list.length; i++) {
+		index (node) {
+			const list=dom.children(node.parentNode);
+			let i;
+			for (i=0; i<list.length; i++) {
 				if (list[i] === node) {
-					break
+					break;
 				}
 			}
 			return i;
 		}
 	}
-	
-	
-	
-	
-}
+};

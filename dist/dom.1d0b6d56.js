@@ -120,6 +120,36 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"dom.js":[function(require,module,exports) {
 window.dom = {
   //增
+  on2: function on2(element, eventType, selector, fn) {
+    if (!(element instanceof Element)) {
+      element = document.querySelector(element);
+    }
+
+    element.addEventListener(eventType, function (e) {
+      var el = e.target;
+
+      if (el.matches(selector)) {
+        fn.call(el, e, el);
+      }
+    });
+  },
+  on: function on(element, eventType, selector, fn) {
+    element.addEventListener(eventType, function (e) {
+      var el = e.target;
+
+      while (!el.matches(selector)) {
+        if (element === el) {
+          el = null;
+          break;
+        }
+
+        el = el.parentNode;
+      }
+
+      el && fn.call(el, e, el);
+    });
+    return element;
+  },
   create: function create(string) {
     var container = document.createElement('template');
     container.innerHTML = string.trim();
@@ -293,7 +323,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53339" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53471" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
